@@ -9,7 +9,7 @@ set smartindent
 " side numbers
 set nu
 set relativenumber
-set wrap 
+set nowrap 
 " search settings
 set incsearch
 set smartcase
@@ -18,13 +18,13 @@ set incsearch
 " file track
 set noswapfile
 set nobackup
-set undodir=~/.vim/undodir
+set undodir=~/.config/nvim/undodir
 set undofile
 set termguicolors " required for applying themes
 set scrolloff=8
 set colorcolumn=80 
 set ma
-
+set cursorline
 
 " ###########################################################
 " PLUG PACKAGE MANAGER
@@ -36,19 +36,33 @@ Plug 'ternjs/tern_for_vim', { 'do' : 'npm install'}
 Plug 'prettier/vim-prettier', {'do' : 'npm install'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vifm/vifm.vim'
+Plug 'itchyny/vim-gitbranch'
 call plug#end()
 
 " ###########################################################
 " STATUSLINE
+function! StatuslineGit()
+  let l:branchname = gitbranch#name()
+  return strlen(l:branchname) > 0?' '.l:branchname.' ':''
+endfunction
+
 set statusline=
 set statusline+=%#PmenuSel#
 
-set statusline+=\ %M
-set statusline+=\ %y
 set statusline+=\ %r
+set statusline+=%#CursorLineNr#
+set statusline+=%{StatuslineGit()}
+set statusline+=%#PmenuSel#
 set statusline+=\ %f
+set statusline+=\ %M
 
 set statusline+=%= " adds to right side
+set statusline+=\ %y
+set statusline+=\  
+set statusline+=%#LineNr#
+set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+set statusline+=\  
+set statusline+=%#PmenuSel#
 set statusline+=\ %c:%l/%L
 set statusline+=\ %p%%
 set statusline+=\ [%n]
