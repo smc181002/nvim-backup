@@ -29,6 +29,7 @@ set cursorline
 " ###########################################################
 " PLUG PACKAGE MANAGER
 call plug#begin('~/.config/nvim/autoload/plugged')
+Plug 'morhetz/gruvbox'
 Plug 'hzchirs/vim-material' "material theme
 Plug 'pangloss/vim-javascript'
 Plug 'mbbill/undotree'
@@ -37,23 +38,26 @@ Plug 'prettier/vim-prettier', {'do' : 'npm install'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vifm/vifm.vim'
 Plug 'itchyny/vim-gitbranch'
+Plug 'mxw/vim-jsx'
+Plug 'mattn/emmet-vim'
+Plug 'ctrlpvim/ctrlp.vim'
 call plug#end()
 
 " ###########################################################
 " STATUSLINE
 function! StatuslineGit()
   let l:branchname = gitbranch#name()
-  return strlen(l:branchname) > 0?' '.l:branchname.' ':''
+  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
 endfunction
 
 set statusline=
 set statusline+=%#PmenuSel#
 
-set statusline+=\ %r
 set statusline+=%#CursorLineNr#
 set statusline+=%{StatuslineGit()}
 set statusline+=%#PmenuSel#
 set statusline+=\ %f
+set statusline+=\ %r
 set statusline+=\ %M
 
 set statusline+=%= " adds to right side
@@ -76,16 +80,34 @@ let g:coc_global_extensions = [
 
 " use TAB to trigger completition
 inoremap <silent><expr> <TAB>
-  \ pumvisible() ? "\<C-n>" :
-  \ <SID>check_back_space() ? "\<TAB>" :
-  \ coc#refresh()
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
-    let col = col('.') - 1
-      return !col || getline('.')[col - 1]  =~# '\s'
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
 let g:coc_snippets_next = '<tab>'
+
+" ###########################################################
+" REACT EMMET AUTOCOMPLETE
+
+let g:user_emmet_leader_key=','
+let g:user_emmet_settings = {
+  \  'javascript.jsx' : {
+    \      'extends' : 'jsx',
+    \  },
+  \}
 
 " ###########################################################
 " LEADER BINDINGS
@@ -94,10 +116,13 @@ let mapleader = " "
 
 " Vertical resizings
 nnoremap <Leader>q :vertical resize +5<CR>
-nnoremap <Leader>f :vertical resize -5<CR>
+nnoremap <Leader>e :vertical resize -5<CR>
 
 " netrw 
 nnoremap <Leader>t :Lexplore<CR>
+
+" Vifm
+nnoremap <Leader>f :Vifm .<CR>
 
 " basic mappings
 nnoremap <Leader>s :w<CR>
@@ -112,15 +137,23 @@ nnoremap <C-l> <C-w>l
 
 " ###########################################################
 " MISC SETTINGS
-let g:ycm_add_preview_to_completeopt = 0
-set completeopt-=preview
 let g:coc_disable_startup_warning = 1
+let g:ctrlp_working_path_mode = 'ra'
 
+let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
 " ###########################################################
 " VIM THEME SETTINGS
 
 set background=dark
-colorscheme vim-material
+let g:gruvbox_italic=1
+colorscheme gruvbox
+" colorscheme vim-material
 
 " ###########################################################
 " PRETTIER CODE FORMATER
